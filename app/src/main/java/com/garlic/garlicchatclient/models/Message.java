@@ -11,10 +11,18 @@ public class Message {
     private String mUsername;
     private String mMessage;
 
-    private Message(MessageType type, String username, String message) {
+    public Message(MessageType type, String username, String message) {
         this.mType = messageTypeSelector(type);
         this.mUsername = username;
         this.mMessage = message;
+    }
+
+    public static Message messageLog(String message) {
+        return new Message(MessageType.TYPE_LOG, null, message);
+    }
+
+    public static Message messageAction(String username) {
+        return new Message(MessageType.TYPE_ACTION, username, null);
     }
 
     public int getType() {
