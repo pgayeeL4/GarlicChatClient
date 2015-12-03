@@ -1,5 +1,6 @@
 package com.garlic.garlicchatclient.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,9 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -67,8 +71,8 @@ public class ChatFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
 
         mAdapter = new MessageAdapter(mMessages);
     }
@@ -87,6 +91,8 @@ public class ChatFragment extends Fragment {
         mSocket.on("typing", onTyping);
         mSocket.on("stop typing", onStopTyping);
         mSocket.connect();
+
+        startSignIn();
 
 
     }
@@ -163,6 +169,44 @@ public class ChatFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (Activity.RESULT_OK != resultCode) {
+            getActivity().finish();
+            return;
+        }
+
+        mUsername = data.getStringExtra("username");
+        int numUsers = data.getIntExtra("numUsers", 1);
+
+        addLog(getResources().getString(R.string.welcome_message));
+        addParticipantsLog(numUsers);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.menu_main, menu);
+        //super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_leave) {
+            leave();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void attemptSend() {
         if (null == mUsername) return;
         if (!mSocket.connected()) return;
@@ -186,6 +230,13 @@ public class ChatFragment extends Fragment {
         mUsername = null;
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         startActivityForResult(intent, REQUEST_LOGIN);
+    }
+
+    private void leave() {
+        mUsername = null;
+        mSocket.disconnect();
+        mSocket.connect();
+        startSignIn();
     }
 
     private void addMessage(String username, String message) {
