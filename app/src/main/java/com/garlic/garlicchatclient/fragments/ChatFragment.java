@@ -322,13 +322,13 @@ public class ChatFragment extends Fragment {
                     int numUsers;
                     try {
                         username = data.getString("username");
-                        numUsers = data.getInt("numUsers");
+                        //numUsers = data.getInt("numUsers");
                     } catch (JSONException e) {
                         return;
                     }
 
                     addLog(getResources().getString(R.string.message_user_joined, username));
-                    addParticipantsLog(numUsers);
+                    //addParticipantsLog(numUsers);
                 }
             });
         }

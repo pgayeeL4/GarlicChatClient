@@ -67,14 +67,14 @@ public class LoginActivity extends Activity {
 
         mLoginFormView = findViewById(R.id.login_form);
 
-        mSocket.on("joined", onLogin);
+        mSocket.on("login", onLogin);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        mSocket.off("joined", onLogin);
+        mSocket.off("login", onLogin);
     }
 
 
@@ -122,19 +122,22 @@ public class LoginActivity extends Activity {
         public void call(Object... args) {
             int numUsers = 0;
 
-            /*JSONObject data = (JSONObject) args[0];
+            JSONObject data = (JSONObject) args[0];
+            String username;
 
             try {
-                numUsers = data.getInt("numUsers");
+                username = data.getString("username");
             } catch (JSONException e) {
                 return;
-            }*/
+            }
 
-            Intent intent = new Intent();
-            intent.putExtra("username", mUsername);
-            intent.putExtra("numUsers", numUsers);
-            setResult(RESULT_OK, intent);
-            finish();
+            //if(username.equals(mUsername)) {
+                Intent intent = new Intent();
+                intent.putExtra("username", mUsername);
+                intent.putExtra("numUsers", numUsers);
+                setResult(RESULT_OK, intent);
+                finish();
+            //}
         }
     };
 
